@@ -9,11 +9,14 @@
         android:id="@+id/crime_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="18dp"
         android:text="Crime Title" />
 
     <TextView
         android:id="@+id/crime_date"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
         android:text="Crime Date" />
 </LinearLayout>

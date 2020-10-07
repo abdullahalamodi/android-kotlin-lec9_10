@@ -18,7 +18,7 @@ import java.util.*
 class CrimeListFragment : Fragment() {
     private lateinit var crimeRecyclerView: RecyclerView;
     private var adapter: CrimeAdapter? = null;
-    private var formater = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+    private var formatter = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         DateFormat.getPatternInstance(DateFormat.YEAR_ABBR_MONTH_WEEKDAY_DAY)
     } else {
         null;
@@ -58,7 +58,7 @@ class CrimeListFragment : Fragment() {
     //to format date
     fun dateFormat(date: Date): String? {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            formater?.format(date)
+            formatter?.format(date)
         } else {
             date.toString();
         };
@@ -102,7 +102,7 @@ class CrimeListFragment : Fragment() {
             this.crime = crime
             titleTextView.text = crime.title
             dateTextView.text = dateFormat(crime.date);
-            imageView.setImageResource(R.drawable.ic_launcher_foreground);
+            imageView.setImageResource(R.drawable.ic_hand_shuck_24);
         }
 
         init {

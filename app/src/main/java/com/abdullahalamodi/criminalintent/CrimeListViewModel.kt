@@ -13,6 +13,8 @@ class CrimeListViewModel : ViewModel() {
             crime.isSolved = (i % 2 == 0);
             crimes += crime;
         }
-        crimes[3].requiresPolice=true;
+        //serious crimes
+        crimes[2].requiresPolice=true;
+        crimes[5].requiresPolice=true;
     }
 }
