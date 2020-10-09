@@ -6,16 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/group"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        app:constraint_referenced_ids="crime_title,crime_date"
-        app:layout_constraintBottom_toBottomOf="@+id/crime_image"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/crime_image" />
-
     <TextView
         android:id="@+id/crime_title"
         android:layout_width="0dp"

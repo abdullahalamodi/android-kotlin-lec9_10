@@ -17,19 +17,16 @@ import java.util.*
 
 class CrimeListFragment : Fragment() {
     private lateinit var crimeRecyclerView: RecyclerView;
-    private var adapter: CrimeAdapter? = null;
+    private var adapter: CrimeAdapter? = CrimeAdapter(emptyList());
     private var formatter = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         DateFormat.getPatternInstance(DateFormat.YEAR_ABBR_MONTH_WEEKDAY_DAY)
     } else {
-        null;
+        null;  //for now no need to format date for old versions.
     };
     private val crimeListViewModel: CrimeListViewModel by lazy {
         ViewModelProviders.of(this).get(CrimeListViewModel::class.java);
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,8 +36,19 @@ class CrimeListFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_crime_list, container, false);
         crimeRecyclerView = view.findViewById(R.id.crime_recycler_view);
         crimeRecyclerView.layoutManager = LinearLayoutManager(context);
-        updateUI();
+        crimeRecyclerView.adapter = adapter;
         return view;
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        crimeListViewModel.crimeListLiveData.observe(
+            viewLifecycleOwner,
+            { crimes ->
+                crimes?.let {
+                    updateUI(crimes)
+                }
+            })
     }
 
     companion object {
@@ -49,8 +57,7 @@ class CrimeListFragment : Fragment() {
         }
     }
 
-    private fun updateUI() {
-        val crimes = crimeListViewModel.crimes
+    private fun updateUI(crimes: List<Crime>) {
         adapter = CrimeAdapter(crimes);
         crimeRecyclerView.adapter = adapter;
     }
@@ -58,7 +65,9 @@ class CrimeListFragment : Fragment() {
     //to format date
     fun dateFormat(date: Date): String? {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            formatter?.format(date)
+            formatter?.run {
+                format(date);
+            }
         } else {
             date.toString();
         };
