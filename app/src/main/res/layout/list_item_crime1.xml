@@ -15,7 +15,7 @@
         android:textStyle="bold"
         android:textSize="18dp"
         app:layout_constraintBottom_toTopOf="@+id/crime_date"
-        app:layout_constraintEnd_toStartOf="@+id/crime_image"
+        app:layout_constraintEnd_toStartOf="@+id/crime_solved"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -26,18 +26,18 @@
         android:layout_marginStart="4dp"
         android:text="Crime Date"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/crime_image"
+        app:layout_constraintEnd_toStartOf="@+id/crime_solved"
         app:layout_constraintStart_toStartOf="@+id/crime_title"
         app:layout_constraintTop_toBottomOf="@+id/crime_title" />
 
     <ImageView
-        android:id="@+id/crime_image"
+        android:id="@+id/crime_solved"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:src="@drawable/ic_hand_shuck_24"
+        android:src="@drawable/ic_solved"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

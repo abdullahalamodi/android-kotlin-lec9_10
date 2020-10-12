@@ -1,7 +1,6 @@
 package com.abdullahalamodi.criminalintent
 
 import androidx.lifecycle.ViewModel
-import com.abdullahalamodi.criminalintent.database.CrimeRepository
 
 class CrimeListViewModel : ViewModel() {
 //    val crimes = mutableListOf<Crime>();

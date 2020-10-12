@@ -38,7 +38,7 @@ class CrimeFragment : Fragment() {
             isEnabled = false
         }
         solvedCheckBox.apply {
-            setOnCheckedChangeListener{m,isChecked ->
+            setOnCheckedChangeListener{_,isChecked ->
                 crime.isSolved = isChecked;
             }
         }
