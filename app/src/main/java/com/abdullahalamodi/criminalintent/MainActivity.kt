@@ -2,9 +2,11 @@ package com.abdullahalamodi.criminalintent
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import java.util.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() , CrimeListFragment.Callbacks {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -19,5 +21,18 @@ class MainActivity : AppCompatActivity() {
                 .add(R.id.fragment_container,fragment)
                 .commit()
         }
+    }
+
+    override fun onCrimeSelected(crimeId: UUID) {
+        val fragment = CrimeFragment.newInstance(crimeId);
+        replaceFragment(fragment)
+    }
+
+    private fun replaceFragment(fragment: Fragment){
+        supportFragmentManager
+            .beginTransaction()
+            .add(R.id.fragment_container,fragment)
+            .addToBackStack(null)
+            .commit()
     }
 }

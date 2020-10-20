@@ -1,5 +1,6 @@
 package com.abdullahalamodi.criminalintent
 
+import android.content.Context
 import android.icu.text.DateFormat
 import android.os.Build
 import android.os.Bundle
@@ -8,16 +9,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import java.util.*
 
 class CrimeListFragment : Fragment() {
+    private var callbacks: Callbacks? = null;
     private lateinit var crimeRecyclerView: RecyclerView;
-    private var adapter: CrimeAdapter? = CrimeAdapter(emptyList());
+    private var adapter: CrimeAdapter? = CrimeAdapter();
     private var formatter = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         DateFormat.getPatternInstance(DateFormat.YEAR_ABBR_MONTH_WEEKDAY_DAY)
     } else {
@@ -27,6 +30,11 @@ class CrimeListFragment : Fragment() {
         ViewModelProviders.of(this).get(CrimeListViewModel::class.java);
     }
 
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        callbacks = context as Callbacks?;
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -58,7 +66,8 @@ class CrimeListFragment : Fragment() {
     }
 
     private fun updateUI(crimes: List<Crime>) {
-        adapter = CrimeAdapter(crimes);
+        adapter = CrimeAdapter();
+        adapter?.submitList(crimes);
         crimeRecyclerView.adapter = adapter;
     }
 
@@ -79,28 +88,29 @@ class CrimeListFragment : Fragment() {
         abstract fun bind(crime: Crime)
     }
 
-    private inner class CrimeHolder(itemView: View) : BaseHolder(itemView), View.OnClickListener {
-        private lateinit var crime: Crime;
-        private val titleTextView: TextView = itemView.findViewById(R.id.crime_title);
-        private val dateTextView: TextView = itemView.findViewById(R.id.crime_date);
+    /* private inner class CrimeHolder(itemView: View) : BaseHolder(itemView), View.OnClickListener {
+         private lateinit var crime: Crime;
+         private val titleTextView: TextView = itemView.findViewById(R.id.crime_title);
+         private val dateTextView: TextView = itemView.findViewById(R.id.crime_date);
 
 
-        init {
-            itemView.setOnClickListener(this);
-        }
+         init {
+             itemView.setOnClickListener(this);
+         }
 
-        override fun bind(crime: Crime) {
-            this.crime = crime
-            titleTextView.text = crime.title
-            dateTextView.text = dateFormat(crime.date);
+         override fun bind(crime: Crime) {
+             this.crime = crime
+             titleTextView.text = crime.title
+             dateTextView.text = dateFormat(crime.date);
 
-        }
+         }
 
-        override fun onClick(v: View?) {
-            Toast.makeText(context, "${crime.title} pressed!", Toast.LENGTH_SHORT).show();
-        }
+         override fun onClick(v: View?) {
+             //Toast.makeText(context, "${crime.title} pressed!", Toast.LENGTH_SHORT).show();
 
-    }
+         }
+
+     }*/
 
     private inner class SeriousCrimeHolder(itemView: View) : BaseHolder(itemView) {
         lateinit var crime: Crime;
@@ -109,12 +119,11 @@ class CrimeListFragment : Fragment() {
         private val solvedImageView: ImageView = itemView.findViewById(R.id.crime_solved)
 
 
-
         override fun bind(crime: Crime) {
             this.crime = crime
             titleTextView.text = crime.title
             dateTextView.text = dateFormat(crime.date);
-            solvedImageView.visibility = if (crime.isSolved){
+            solvedImageView.visibility = if (crime.isSolved) {
                 View.VISIBLE
             } else {
                 View.GONE
@@ -123,15 +132,16 @@ class CrimeListFragment : Fragment() {
 
         init {
             itemView.setOnClickListener {
-                Toast.makeText(context, "${crime.title} pressed!", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, "${crime.title} pressed!", Toast.LENGTH_SHORT).show();
+                callbacks?.onCrimeSelected(crime.id);
             }
         }
     }
 
 
     //adapter class
-    private inner class CrimeAdapter(val crimes: List<Crime>) :
-        RecyclerView.Adapter<BaseHolder>() {
+    private inner class CrimeAdapter() :
+        ListAdapter<Crime,BaseHolder>(CrimeDiffUtil()) {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseHolder {
 
@@ -151,11 +161,11 @@ class CrimeListFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: BaseHolder, position: Int) {
-            val crime = crimes[position];
+            val crime = getItem(position);
             holder.bind(crime);
         }
 
-        override fun getItemCount() = crimes.size;
+       // override fun getItemCount() = crimes.size;
 
 //        override fun getItemViewType(position: Int): Int {
 //            return when (crimes[position].requiresPolice) {
@@ -165,4 +175,20 @@ class CrimeListFragment : Fragment() {
 //        }
 
     }
+
+    interface Callbacks {
+        fun onCrimeSelected(crimeId: UUID)
+    }
+
+    class CrimeDiffUtil : DiffUtil.ItemCallback<Crime>() {
+        override fun areItemsTheSame(oldItem: Crime, newItem: Crime): Boolean {
+            return oldItem.id === newItem.id;
+        }
+
+        override fun areContentsTheSame(oldItem: Crime, newItem: Crime): Boolean {
+           return oldItem == newItem;
+        }
+
+    }
 }
+
