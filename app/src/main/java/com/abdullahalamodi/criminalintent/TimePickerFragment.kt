@@ -1,6 +1,5 @@
 package com.abdullahalamodi.criminalintent
 
-import android.app.DatePickerDialog
 import android.app.Dialog
 import android.app.TimePickerDialog
 import android.os.Bundle
@@ -12,16 +11,18 @@ private const val ARG_TIME = "time"
 
 class TimePickerFragment : DialogFragment() {
     interface Callbacks {
-        fun onDateSelected(date: Date)
+        fun onTimeSelected(date: Date)
     }
 
+    val cal = Calendar.getInstance();
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dateListener =
-            TimePickerDialog.OnTimeSetListener { _: TimePicker?, hourOfDay: Int, minute: Int->
-//                val resultDate: Date = GregorianCalendar(hourOfDay, minute).time
-//                targetFragment?.let { fragment ->
-//                    (fragment as DatePickerFragment.Callbacks).onDateSelected(resultDate)
-//                }
+            TimePickerDialog.OnTimeSetListener { _: TimePicker?, hourOfDay: Int, minute: Int ->
+                cal.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                cal.set(Calendar.MINUTE, minute)
+                targetFragment?.let { fragment ->
+                    (fragment as Callbacks).onTimeSelected(cal.time)
+                }
             }
 
         val time = arguments?.getSerializable(ARG_TIME) as Date

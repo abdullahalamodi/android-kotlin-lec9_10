@@ -11,6 +11,7 @@ import android.widget.CheckBox
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
+import java.text.SimpleDateFormat
 import java.util.*
 
 private const val ARG_CRIME_ID = "crime_id";
@@ -19,7 +20,8 @@ private const val DIALOG_TIME = "DialogTime"
 private const val REQUEST_DATE = 0
 private const val REQUEST_TIME = 1
 
-class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
+class CrimeFragment : Fragment(),
+    DatePickerFragment.Callbacks,TimePickerFragment.Callbacks {
 
     private lateinit var crime: Crime;
     private lateinit var titleField: EditText
@@ -138,5 +140,9 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
     override fun onDateSelected(date: Date) {
         crime.date = date
         updateUI()
+    }
+
+    override fun onTimeSelected(date: Date) {
+        timeButton.text = SimpleDateFormat("HH:mm",Locale.getDefault()).format(date);
     }
 }
