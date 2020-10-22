@@ -4,11 +4,11 @@ import android.content.Context
 import android.icu.text.DateFormat
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.Group
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DiffUtil
@@ -20,6 +20,8 @@ import java.util.*
 class CrimeListFragment : Fragment() {
     private var callbacks: Callbacks? = null;
     private lateinit var crimeRecyclerView: RecyclerView;
+    private lateinit var clueGroup: Group;
+    private lateinit var addBtn: ImageButton;
     private var adapter: CrimeAdapter? = CrimeAdapter();
     private var formatter = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         DateFormat.getPatternInstance(DateFormat.YEAR_ABBR_MONTH_WEEKDAY_DAY)
@@ -36,6 +38,11 @@ class CrimeListFragment : Fragment() {
         callbacks = context as Callbacks?;
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -45,6 +52,15 @@ class CrimeListFragment : Fragment() {
         crimeRecyclerView = view.findViewById(R.id.crime_recycler_view);
         crimeRecyclerView.layoutManager = LinearLayoutManager(context);
         crimeRecyclerView.adapter = adapter;
+        clueGroup = view.findViewById(R.id.add_clue_group);
+        addBtn = view.findViewById(R.id.add_btn);
+
+        // add button for first crime
+        addBtn.setOnClickListener {
+            val crime = Crime()
+            crimeListViewModel.addCrime(crime)
+            callbacks?.onCrimeSelected(crime.id)
+        }
         return view;
     }
 
@@ -54,7 +70,12 @@ class CrimeListFragment : Fragment() {
             viewLifecycleOwner,
             { crimes ->
                 crimes?.let {
-                    updateUI(crimes)
+                    if (crimes.isNotEmpty()) {
+                        setAddClueViability(View.GONE);
+                        updateUI(crimes)
+                    } else {
+                        setAddClueViability(View.VISIBLE);
+                    }
                 }
             })
     }
@@ -141,7 +162,7 @@ class CrimeListFragment : Fragment() {
 
     //adapter class
     private inner class CrimeAdapter() :
-        ListAdapter<Crime,BaseHolder>(CrimeDiffUtil()) {
+        ListAdapter<Crime, BaseHolder>(CrimeDiffUtil()) {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseHolder {
 
@@ -165,7 +186,7 @@ class CrimeListFragment : Fragment() {
             holder.bind(crime);
         }
 
-       // override fun getItemCount() = crimes.size;
+        // override fun getItemCount() = crimes.size;
 
 //        override fun getItemViewType(position: Int): Int {
 //            return when (crimes[position].requiresPolice) {
@@ -180,13 +201,36 @@ class CrimeListFragment : Fragment() {
         fun onCrimeSelected(crimeId: UUID)
     }
 
+    //menu inflate
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.fragment_crime_list, menu)
+    }
+
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.new_crime -> {
+                val crime = Crime()
+                crimeListViewModel.addCrime(crime)
+                callbacks?.onCrimeSelected(crime.id)
+                true
+            }
+            else -> return super.onOptionsItemSelected(item)
+        }
+    }
+
+    fun setAddClueViability(visible: Int) {
+        clueGroup.visibility = visible;
+    }
+
     class CrimeDiffUtil : DiffUtil.ItemCallback<Crime>() {
         override fun areItemsTheSame(oldItem: Crime, newItem: Crime): Boolean {
             return oldItem.id === newItem.id;
         }
 
         override fun areContentsTheSame(oldItem: Crime, newItem: Crime): Boolean {
-           return oldItem == newItem;
+            return oldItem == newItem;
         }
 
     }
