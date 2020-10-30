@@ -13,9 +13,7 @@ import android.text.format.DateFormat.format
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.EditText
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import java.text.SimpleDateFormat
@@ -39,6 +37,10 @@ class CrimeFragment : Fragment(),
     private lateinit var solvedCheckBox: CheckBox
     private lateinit var reportButton: Button
     private lateinit var suspectButton: Button
+    private lateinit var suspectPhoneButton: Button
+    private lateinit var photoButton: ImageButton
+    private lateinit var photoView: ImageView
+
 
 
     private val crimeDetailViewModel: CrimeDetailViewModel by lazy {
@@ -64,6 +66,9 @@ class CrimeFragment : Fragment(),
         solvedCheckBox = view.findViewById(R.id.crime_solved);
         reportButton = view.findViewById(R.id.crime_report)
         suspectButton = view.findViewById(R.id.crime_suspect)
+        suspectPhoneButton = view.findViewById(R.id.suspect_phone)
+        photoButton = view.findViewById(R.id.crime_camera) as ImageButton
+        photoView = view.findViewById(R.id.crime_photo) as ImageView
 //        dateButton.apply {
 //            text = crime.date.toString()
 //            isEnabled = false
@@ -112,10 +117,21 @@ class CrimeFragment : Fragment(),
             //pickContactIntent.addCategory(Intent.CATEGORY_HOME)
             val packageManager: PackageManager = requireActivity().packageManager
             val resolvedActivity: ResolveInfo? =
-                packageManager.resolveActivity(pickContactIntent,
-                    PackageManager.MATCH_DEFAULT_ONLY)
+                packageManager.resolveActivity(
+                    pickContactIntent,
+                    PackageManager.MATCH_DEFAULT_ONLY
+                )
             if (resolvedActivity == null) {
                 isEnabled = false
+            }
+        }
+
+        suspectPhoneButton.apply {
+            this.isEnabled = crime.suspectPhone != "";
+            val callContactIntent = Intent(Intent.ACTION_DIAL)
+            callContactIntent.data = Uri.parse("tel:${crime.suspectPhone}")
+            setOnClickListener {
+                startActivity(callContactIntent)
             }
         }
         return view;
@@ -179,7 +195,10 @@ class CrimeFragment : Fragment(),
             requestCode == REQUEST_CONTACT && data != null -> {
                 val contactUri: Uri? = data.data
                 // Specify which fields you want your query to return values for
-                val queryFields = arrayOf(ContactsContract.Contacts.DISPLAY_NAME)
+                val queryFields = arrayOf(
+                    ContactsContract.Contacts.DISPLAY_NAME,
+                    ContactsContract.CommonDataKinds.Phone.NUMBER
+                )
                 // Perform your query - the contactUri is like a "where" clause here
                 val cursor = contactUri?.let {
                     requireActivity().contentResolver
@@ -195,11 +214,14 @@ class CrimeFragment : Fragment(),
                     it.moveToFirst()
                     val suspect = it.getString(0)
                     crime.suspect = suspect
+                    crime.suspectPhone = it.getString(1)
                     crimeDetailViewModel.saveCrime(crime)
                     suspectButton.text = suspect
                 }
             }
         }
+
+
     }
 
     private fun getCrimeReport(): String {
