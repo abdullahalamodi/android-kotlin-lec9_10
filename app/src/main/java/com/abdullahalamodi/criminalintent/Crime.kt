@@ -3,8 +3,10 @@ package com.abdullahalamodi.criminalintent
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.util.*
+
 @Entity
-data class Crime(@PrimaryKey
+data class Crime(
+    @PrimaryKey
     val id: UUID = UUID.randomUUID(),
     var title: String = "",
     var date: Date = Date(),
@@ -12,4 +14,9 @@ data class Crime(@PrimaryKey
     var suspect: String = "",
     var suspectPhone: String = ""
     //var requiresPolice: Boolean = false
-)
+
+) {
+
+    val photoFileName
+        get() = "IMG_$id.jpg"
+}

@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import java.io.File
 import java.util.*
 
 class CrimeListFragment : Fragment() {
@@ -137,13 +138,24 @@ class CrimeListFragment : Fragment() {
         lateinit var crime: Crime;
         private val titleTextView: TextView = itemView.findViewById(R.id.crime_title);
         private val dateTextView: TextView = itemView.findViewById(R.id.crime_date);
+        private val imageTextView: ImageView = itemView.findViewById(R.id.crime_photo);
         private val solvedImageView: ImageView = itemView.findViewById(R.id.crime_solved)
+        private lateinit var photoFile: File;
 
 
         override fun bind(crime: Crime) {
             this.crime = crime
             titleTextView.text = crime.title
             dateTextView.text = dateFormat(crime.date);
+            imageTextView.apply {
+                photoFile = crimeListViewModel.getPhotoFile(crime)
+                if (photoFile.exists()) {
+                    val bitmap = getScaledBitmap(photoFile.path, requireActivity())
+                    this.setImageBitmap(bitmap)
+                } else {
+                    this.setImageDrawable(null)
+                }
+            }
             solvedImageView.visibility = if (crime.isSolved) {
                 View.VISIBLE
             } else {
