@@ -232,7 +232,7 @@ class CrimeListFragment : Fragment() {
         }
     }
 
-    fun setAddClueViability(visible: Int) {
+    private fun setAddClueViability(visible: Int) {
         clueGroup.visibility = visible;
     }
 
